@@ -12,7 +12,6 @@ Live Demo: The Open Record Fact Checker
 ✨ Key Features
 
 Core Functionality
-
 Lightning-Fast Search: Server-side RSS caching for sub-second response times
 Multi-Source Verification: Combines Google Custom Search API with cached fact-checker RSS feeds
 Source Diversity: Displays results from FactCheck.org, Snopes, PolitiFact, AFP Fact Check, Full Fact, and more
@@ -20,7 +19,6 @@ Smart Categorization: Groups sources by reliability tier (Dedicated Fact-Checker
 Real-Time Integration: Live API calls combined with cached content for optimal performance
 
 Technical Highlights
-
 Hybrid Architecture: Server-side database + client-side APIs for best of both worlds
 Professional UI: Clean, responsive design optimized for all devices
 Privacy-Focused Analytics: Uses Plausible Analytics without personal data collection
@@ -29,7 +27,6 @@ Performance Optimized: Sub-500ms response times vs 3+ seconds for API-only appro
 
 🚀 Quick Start
 For Users
-
 Visit the Tool: theopenrecord.github.io/fact-checker-tool
 Enter a Claim: Type any statement you want to verify
 Review Results: See fact-checks from multiple trusted sources categorized by reliability
@@ -43,24 +40,23 @@ cd fact-checker-tool
 # Serve locally
 python -m http.server 8000
 # Visit http://localhost:8000
+
 🏗️ Architecture
 Frontend
-
 Technology: Vanilla HTML5, CSS3, ES6+ JavaScript
 Framework: Self-contained single-page application
 Analytics: Plausible Analytics integration
 Deployment: Static hosting via GitHub Pages
 
 Backend Integration
-
 Primary Search: Google Custom Search API for real-time results
 Secondary Cache: Server-side RSS database for lightning-fast responses
 Hybrid Strategy: Combines live APIs with cached content for optimal speed and coverage
 Data Processing: Smart source grouping and result deduplication
 
 Data Sources
-Tier 1 - Dedicated Fact-Checkers:
 
+Tier 1 - Dedicated Fact-Checkers:
 FactCheck.org
 Snopes.com
 PolitiFact.com
@@ -68,14 +64,12 @@ AFP Fact Check
 Full Fact
 
 Tier 2 - Independent News Sources:
-
 Reuters Fact Check
 AP Fact Check
 BBC Reality Check
 Science Feedback
 
 📊 Performance Metrics
-
 Response Time: < 500ms average (vs 3+ seconds API-only)
 Source Coverage: 8+ fact-checking organizations
 Accuracy: Based on authoritative fact-checking sources
@@ -84,7 +78,6 @@ Cache Hit Rate: 70%+ for common claims
 
 🧪 Alpha Testing
 Current Status
-
 Phase: Alpha testing with technical users
 Feedback Collection: Google Forms
 Analytics: Live usage tracking via Plausible
@@ -102,6 +95,7 @@ Development Priorities
 📋 URL fact-checking for direct link analysis
 📋 Advanced result filtering and sorting options
 🔧 Technical Implementation
+
 Core Search Algorithm
 javascript// Hybrid search strategy
 async function performFactCheck(claim) {
@@ -134,6 +128,7 @@ function groupSourcesByPublisher(articles) {
     return rankSourcesByReliability(grouped);
 }
 📈 Development Timeline
+
 Phase 1: Foundation (Completed)
 
 ✅ v1.0-4.0: Basic fact-checking with API integration
@@ -157,14 +152,13 @@ Phase 3: Scale (Planned)
 📋 Multi-language support for international expansion
 
 🔍 Research & Innovation
+
 Open Source Integration
 Currently researching integration with:
-
 TheUnlocked/Bias-Finder: Chrome extension for bias detection
 mihirKachroo/Bias-Finder-Chrome-Extension: Scholarly article analysis
 
 API Research
-
 AllSides.com: Media bias ratings and source classifications
 Newstrition: Comprehensive news reliability data
 Freedom Forum Institute: Academic backing for methodology
@@ -178,7 +172,6 @@ Minimal Analytics: Only aggregate usage patterns tracked
 Transparent Processing: Users informed of all data handling
 
 API Security
-
 Environment Variables: Secure API key management
 Rate Limiting: Prevents abuse and ensures availability
 Error Handling: Graceful degradation when services unavailable
@@ -186,21 +179,18 @@ Input Sanitization: Protection against malicious input
 
 🚀 Future Roadmap
 Short-term (Next 30 days)
-
 Beta Release: Expand testing to non-technical users
 Bias Detection: Implement AllSides or Newstrition integration
 Mobile Optimization: Enhanced responsive design
 Performance Monitoring: Advanced analytics and error tracking
 
 Medium-term (Next 3 months)
-
 OCR Integration: Image-based claim verification
 URL Analysis: Direct link fact-checking capability
 Advanced Filtering: Sort by date, source type, credibility
 API Partnerships: Direct agreements with fact-checkers
 
 Long-term (Next 12 months)
-
 Browser Extensions: Real-time social media fact-checking
 Mobile Applications: Native iOS and Android apps
 Video Analysis: Extract and verify claims from video content
@@ -208,14 +198,12 @@ International Expansion: Multi-language fact-checking support
 
 📊 Analytics & Monitoring
 Usage Metrics (Privacy-Focused)
-
 Claims Processed: Track search volume and patterns
 Source Utilization: Monitor which fact-checkers are most valuable
 Performance: Response times and error rates
 User Experience: Session duration and interaction patterns
 
 Quality Assurance
-
 Automated Testing: Continuous integration for deployments
 Manual Testing: Regular verification of fact-checking accuracy
 User Feedback: Direct feedback collection and implementation
@@ -223,7 +211,6 @@ Source Monitoring: Regular checks on fact-checker RSS feed health
 
 🤝 Contributing
 Development Process
-
 Fork the repository
 Create feature branch: git checkout -b feature/new-feature
 Make changes and test thoroughly
@@ -231,7 +218,6 @@ Commit with clear messages: git commit -m "Add: new search algorithm"
 Push and create Pull Request
 
 Code Standards
-
 ES6+ JavaScript: Modern syntax and best practices
 Responsive Design: Mobile-first CSS approach
 Documentation: Inline comments for complex logic
@@ -239,7 +225,6 @@ Testing: Manual testing required for API integrations
 Performance: Optimize for speed and accessibility
 
 Areas for Contribution
-
 UI/UX Improvements: Enhanced design and user experience
 API Integrations: Additional fact-checking sources
 Performance Optimization: Faster search algorithms
@@ -248,7 +233,6 @@ Testing: Automated testing framework development
 
 📝 Testing
 Manual Test Cases
-
 COVID-related claims: "COVID vaccines contain microchips"
 Political statements: "Election fraud in 2020"
 Science misinformation: "Climate change is a hoax"
@@ -256,7 +240,6 @@ Health claims: "Vitamin C prevents cancer"
 Technology rumors: "5G causes health problems"
 
 Expected Results
-
 Fast Response: Sub-second search completion
 Source Diversity: Multiple fact-checkers represented
 Accurate Classification: Correct FALSE/TRUE/MIXED determinations
