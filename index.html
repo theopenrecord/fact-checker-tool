@@ -804,6 +804,38 @@
     </div>
 
     <script>
+// AllSides Source Classification System - Political Bias Transparency
+const ALLSIDES_CLASSIFICATIONS = {
+    // CENTER SOURCES (Black background, white text)
+    'factcheck.org': { bias: 'center', credibility: 'high', display_name: 'FactCheck.org', color_scheme: 'center' },
+    'snopes.com': { bias: 'center', credibility: 'high', display_name: 'Snopes', color_scheme: 'center' },
+    'factcheck.afp.com': { bias: 'center', credibility: 'high', display_name: 'AFP Fact Check', color_scheme: 'center' },
+    'fullfact.org': { bias: 'center', credibility: 'high', display_name: 'Full Fact', color_scheme: 'center' },
+    'reuters.com': { bias: 'center', credibility: 'high', display_name: 'Reuters Fact Check', color_scheme: 'center' },
+    'apnews.com': { bias: 'center', credibility: 'high', display_name: 'AP Fact Check', color_scheme: 'center' },
+
+    // LEAN LEFT SOURCES (Blue background, white text)
+    'usatoday.com': { bias: 'lean-left', credibility: 'medium', display_name: 'USA TODAY', color_scheme: 'lean-left' },
+    'politifact.com': { bias: 'lean-left', credibility: 'high', display_name: 'PolitiFact', color_scheme: 'lean-left' },
+    'washingtonpost.com': { bias: 'lean-left', credibility: 'medium', display_name: 'Washington Post', color_scheme: 'lean-left' },
+
+    // LEAN RIGHT SOURCES (Red background, white text)  
+    'wsj.com': { bias: 'lean-right', credibility: 'medium', display_name: 'Wall Street Journal', color_scheme: 'lean-right' },
+    'foxnews.com': { bias: 'lean-right', credibility: 'medium', display_name: 'Fox News', color_scheme: 'lean-right' }
+};
+
+const COLOR_SCHEMES = {
+    'center': { background: '#2c2c2c', text: '#ffffff', border: '#555555', label: 'Center', icon: '⚫' },
+    'lean-left': { background: '#1e3a8a', text: '#ffffff', border: '#3b82f6', label: 'Lean Left', icon: '🔵' },
+    'lean-right': { background: '#dc2626', text: '#ffffff', border: '#ef4444', label: 'Lean Right', icon: '🔴' }
+};
+
+function getSourceClassification(url) {
+    const domain = url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+    return ALLSIDES_CLASSIFICATIONS[domain] || { 
+        bias: 'center', credibility: 'medium', display_name: domain, color_scheme: 'center' 
+    };
+}
         async function searchFactChecks() {
             const query = document.getElementById('searchQuery').value.trim();
             if (!query) return;
