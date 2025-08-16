@@ -577,7 +577,77 @@
                 gap: 10px;
             }
         }
-    </style>
+/* Feature Tooltip Styles - ADD THIS SECTION */
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .feature-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+        opacity: 0.8;
+        transform: translateX(5px);
+    }
+
+    .info-icon {
+        margin-left: 8px;
+        width: 16px;
+        height: 16px;
+        background: rgba(255,255,255,0.3);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        background: #2c3e50;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.4;
+        max-width: 300px;
+        white-space: normal;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        margin-bottom: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 20px;
+        border: 6px solid transparent;
+        border-top-color: #2c3e50;
+    }
+
+    .feature-item:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+
+</style>
 </head>
 <body>
     <div class="container">
@@ -630,14 +700,41 @@
                     <p>Advanced fact-checking tool using hybrid search technology to provide fast, comprehensive verification of claims.</p>
                 </div>
                 <div class="footer-section">
-                    <h4>Features</h4>
-                    <ul>
-                        <li>Hybrid Search Engine</li>
-                        <li>Multiple Fact-Check Sources</li>
-                        <li>Credibility Ranking</li>
-                        <li>Real-time Results</li>
-                    </ul>
-                </div>
+    <h4>Features</h4>
+    <div class="feature-list">
+        <div class="feature-item">
+            <span>🔄 Hybrid Search Engine</span>
+            <div class="info-icon">i</div>
+            <div class="tooltip">
+                Combines lightning-fast local database searches with real-time Google API calls for comprehensive coverage
+            </div>
+        </div>
+        
+        <div class="feature-item">
+            <span>📊 Multiple Fact-Check Sources</span>
+            <div class="info-icon">i</div>
+            <div class="tooltip">
+                Searches across Snopes, PolitiFact, FactCheck.org, AFP Fact Check, and more for diverse perspectives
+            </div>
+        </div>
+        
+        <div class="feature-item">
+            <span>🏆 Credibility Ranking</span>
+            <div class="info-icon">i</div>
+            <div class="tooltip">
+                Sources are categorized by reliability: Dedicated Fact-Checkers, Independent News, and General Sources
+            </div>
+        </div>
+        
+        <div class="feature-item">
+            <span>⚡ Real-time Results</span>
+            <div class="info-icon">i</div>
+            <div class="tooltip">
+                Sub-second response times through intelligent caching and parallel API calls
+            </div>
+        </div>
+    </div>
+</div>
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <ul>
