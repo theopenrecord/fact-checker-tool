@@ -1,5 +1,5 @@
 # fact-checker-tool
-Open source fact-checking tool with multi-source verification - v5.1.2
+Open source fact-checking tool with multi-source verification - v5.3.1
 The Open Record - Fact Checker
 A comprehensive fact-checking tool that verifies claims in social media memes and posts using live fact-checking APIs with server-side RSS integration.
 
