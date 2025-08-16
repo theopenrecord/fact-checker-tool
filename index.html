@@ -804,6 +804,9 @@
     </div>
 
     <script>
+// Complete Fact-Checker JavaScript with AllSides Political Bias Transparency
+// Replace entire <script> section with this code
+
 // AllSides Source Classification System - Political Bias Transparency
 const ALLSIDES_CLASSIFICATIONS = {
     // CENTER SOURCES (Black background, white text)
@@ -818,10 +821,12 @@ const ALLSIDES_CLASSIFICATIONS = {
     'usatoday.com': { bias: 'lean-left', credibility: 'medium', display_name: 'USA TODAY', color_scheme: 'lean-left' },
     'politifact.com': { bias: 'lean-left', credibility: 'high', display_name: 'PolitiFact', color_scheme: 'lean-left' },
     'washingtonpost.com': { bias: 'lean-left', credibility: 'medium', display_name: 'Washington Post', color_scheme: 'lean-left' },
+    'cnn.com': { bias: 'lean-left', credibility: 'medium', display_name: 'CNN', color_scheme: 'lean-left' },
 
     // LEAN RIGHT SOURCES (Red background, white text)  
     'wsj.com': { bias: 'lean-right', credibility: 'medium', display_name: 'Wall Street Journal', color_scheme: 'lean-right' },
-    'foxnews.com': { bias: 'lean-right', credibility: 'medium', display_name: 'Fox News', color_scheme: 'lean-right' }
+    'foxnews.com': { bias: 'lean-right', credibility: 'medium', display_name: 'Fox News', color_scheme: 'lean-right' },
+    'nypost.com': { bias: 'lean-right', credibility: 'medium', display_name: 'New York Post', color_scheme: 'lean-right' }
 };
 
 const COLOR_SCHEMES = {
@@ -836,383 +841,338 @@ function getSourceClassification(url) {
         bias: 'center', credibility: 'medium', display_name: domain, color_scheme: 'center' 
     };
 }
-        async function searchFactChecks() {
-            const query = document.getElementById('searchQuery').value.trim();
-            if (!query) return;
 
-            const loadingEl = document.getElementById('loading');
-            const resultsEl = document.getElementById('results');
-            const searchStatsEl = document.getElementById('searchStats');
+async function searchFactChecks() {
+    const query = document.getElementById('searchQuery').value.trim();
+    if (!query) return;
 
-            loadingEl.style.display = 'block';
-            resultsEl.innerHTML = '';
-            searchStatsEl.innerHTML = '';
+    const loadingEl = document.getElementById('loading');
+    const resultsEl = document.getElementById('results');
+    const searchStatsEl = document.getElementById('searchStats');
 
-            const startTime = performance.now();
+    loadingEl.style.display = 'block';
+    resultsEl.innerHTML = '';
+    searchStatsEl.innerHTML = '';
 
-            try {
-                // Use Hybrid Search API (Local RSS + Google)
-                const hybridApiUrl = '/tools/fact_checker/api/hybrid_search.php';
-                const response = await fetch(`${hybridApiUrl}?q=${encodeURIComponent(query)}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const endTime = performance.now();
-                const clientTime = Math.round(endTime - startTime);
+    const startTime = performance.now();
 
-                displayHybridResults(data, query, clientTime);
-                
-            } catch (error) {
-                console.error('Hybrid search error:', error);
-                
-                // Fallback to Google API if hybrid search fails
-                console.log('Falling back to Google API...');
-                await fallbackToGoogleSearch(query, startTime);
-            } finally {
-                loadingEl.style.display = 'none';
-            }
-        }
+    try {
+        // Use Hybrid Search API (Local RSS + Google)
+        const hybridApiUrl = '/tools/fact_checker/api/hybrid_search.php';
+        const response = await fetch(`${hybridApiUrl}?q=${encodeURIComponent(query)}`);
+        
+        let claims = [];
+        let searchStats = { local: 0, google: 0, total_time: 0 };
 
-        async function fallbackToGoogleSearch(query, startTime) {
-            try {
-                const apiKey = 'AIzaSyCHA50I0hyNuX3sU3kVLrqqL1iaczsQmSc';
-                const response = await fetch(`https://factchecktools.googleapis.com/v1alpha1/claims:search?query=${encodeURIComponent(query)}&key=${apiKey}&maxAgeDays=7300&pageSize=20`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const endTime = performance.now();
-                const searchTime = Math.round(endTime - startTime);
-
-                displayResults(data.claims || [], query, searchTime);
-                
-            } catch (error) {
-                console.error('Fallback search error:', error);
-                const resultsEl = document.getElementById('results');
-                resultsEl.innerHTML = `
-                    <div class="error-message">
-                        <h3>Search Error</h3>
-                        <p>Unable to perform fact-check search. Please check your API configuration and try again.</p>
-                        <p class="error-details">Error: ${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-
-        function displayHybridResults(data, query, clientTime) {
-            const resultsEl = document.getElementById('results');
-            const searchStatsEl = document.getElementById('searchStats');
+        if (response.ok) {
+            const data = await response.json();
+            claims = data.claims || [];
+            searchStats = data.stats || searchStats;
+        } else {
+            // Fallback to Google Fact Check Tools API
+            console.log('Hybrid search failed, using Google fallback');
+            const googleApiKey = 'AIzaSyCHA50I0hyNuX3sU3kVLrqqL1iaczsQmSc';
+            const factCheckUrl = `https://factchecktools.googleapis.com/v1alpha1/claims:search?query=${encodeURIComponent(query)}&key=${googleApiKey}`;
             
-            // Display search stats
-            const stats = data.stats || {};
-            searchStatsEl.innerHTML = `
-                <div class="search-stats hybrid-stats">
-                    <div class="stats-summary">
-                        <span class="query-text">Results for: "${query}"</span>
-                        <span class="result-count">${stats.total_combined || 0} results found</span>
-                        <span class="search-time">Total: ${stats.total_time_ms || 0}ms</span>
-                    </div>
-                    <div class="source-breakdown">
-                        <span class="local-stats">🏠 LOCAL: ${stats.local_count || 0} results (${stats.local_time_ms || 0}ms)</span>
-                        <span class="google-stats">🌐 GOOGLE: ${stats.google_count || 0} results (${stats.google_time_ms || 0}ms)</span>
-                    </div>
+            const googleResponse = await fetch(factCheckUrl);
+            if (googleResponse.ok) {
+                const googleData = await googleResponse.json();
+                claims = googleData.claims || [];
+                searchStats.google = claims.length;
+            }
+        }
+
+        const endTime = performance.now();
+        searchStats.total_time = endTime - startTime;
+
+        loadingEl.style.display = 'none';
+
+        if (claims.length === 0) {
+            resultsEl.innerHTML = `
+                <div class="no-results">
+                    <h3>No Fact-Checks Found</h3>
+                    <p>No fact-checking information found for "${query}". Try different keywords or check spelling.</p>
                 </div>
             `;
-
-            const organized = data.organized_results || {};
-            
-            // If no results at all
-            if (!data.results || data.results.length === 0) {
-                resultsEl.innerHTML = `
-                    <div class="no-results">
-                        <h3>No Fact-Checks Found</h3>
-                        <p>No fact-checking information found for "${query}". Try different keywords or check spelling.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            let resultsHTML = '';
-
-            // Dedicated Fact Checkers
-            if (organized.fact_checkers && organized.fact_checkers.length > 0) {
-                resultsHTML += `
-                    <div class="results-section">
-                        <h3 class="section-title">🎯 Dedicated Fact Checkers</h3>
-                        ${organized.fact_checkers.map(result => createHybridResultCard(result)).join('')}
-                    </div>
-                `;
-            }
-
-            // Independent News Sources  
-            if (organized.news_independent && organized.news_independent.length > 0) {
-                resultsHTML += `
-                    <div class="results-section">
-                        <h3 class="section-title">📰 Independent News Sources</h3>
-                        ${organized.news_independent.map(result => createHybridResultCard(result)).join('')}
-                    </div>
-                `;
-            }
-
-            // Government Sources
-            if (organized.government && organized.government.length > 0) {
-                resultsHTML += `
-                    <div class="results-section">
-                        <h3 class="section-title">🏛️ Government Sources</h3>
-                        ${organized.government.map(result => createHybridResultCard(result)).join('')}
-                    </div>
-                `;
-            }
-
-            // Other Sources
-            if (organized.other && organized.other.length > 0) {
-                resultsHTML += `
-                    <div class="results-section">
-                        <h3 class="section-title">📄 Other Sources</h3>
-                        ${organized.other.map(result => createHybridResultCard(result)).join('')}
-                    </div>
-                `;
-            }
-
-            resultsEl.innerHTML = resultsHTML;
-            
-            // Show methodology after displaying results
-            document.getElementById('methodology').style.display = 'block';
-            
-            console.log('🔍 Hybrid Search Results:', data);
+            return;
         }
 
-        function createHybridResultCard(result) {
-            const tierClass = getTierClass(result.tier);
-            const ratingClass = getRatingClass(result.rating);
-            
-            return `
-                <div class="result-card ${tierClass}">
-                    <div class="result-header">
-                        <div class="source-header">
-                            <div class="source-name">${result.source}</div>
-                            <div class="source-badges">
-                                <span class="search-indicator ${result.search_source}">${result.indicator || ''}</span>
-                                ${result.rating ? `<span class="rating ${ratingClass}">${result.rating}</span>` : ''}
-                            </div>
-                        </div>
-                        <h4 class="result-title">
-                            <a href="${result.url}" target="_blank" rel="noopener">${result.title}</a>
-                        </h4>
-                    </div>
-                    <p class="result-snippet">${result.snippet}</p>
-                    ${result.keywords ? `<div class="keywords">Keywords: ${result.keywords}</div>` : ''}
-                    ${result.topics ? `<div class="topics">Topics: ${result.topics}</div>` : ''}
-                </div>
-            `;
+        displayResults(claims, searchStats, query);
+
+    } catch (error) {
+        loadingEl.style.display = 'none';
+        console.error('Search error:', error);
+        resultsEl.innerHTML = `
+            <div class="search-error">
+                <h3>Search Error</h3>
+                <p>Unable to perform fact-check search. Please check your API configuration and try again.</p>
+                <p>Error: ${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+function displayResults(claims, stats, query) {
+    const resultsEl = document.getElementById('results');
+    const searchStatsEl = document.getElementById('searchStats');
+
+    // Display search statistics
+    searchStatsEl.innerHTML = `
+        <div class="search-summary">
+            Results for: "<strong>${query}</strong>" 
+            <span class="result-count">${claims.length} results found</span>
+            <span class="search-time">Total: ${stats.total_time.toFixed(0)}ms</span>
+        </div>
+        
+        <div class="search-breakdown">
+            ${stats.local > 0 ? `<span class="local-results">🏠 LOCAL: ${stats.local} results (${stats.local_time ? stats.local_time.toFixed(0) : '0'}ms)</span>` : ''}
+            ${stats.google > 0 ? `<span class="google-results">🌐 GOOGLE: ${stats.google} results (${stats.google_time ? stats.google_time.toFixed(0) : '0'}ms)</span>` : ''}
+        </div>
+    `;
+
+    // Group by political bias using AllSides classifications
+    const biasGrouped = {
+        'center': [],
+        'lean-left': [],
+        'lean-right': []
+    };
+
+    // Classify all results by political bias
+    claims.forEach(claim => {
+        const review = claim.claimReview?.[0];
+        if (review && review.url) {
+            const classification = getSourceClassification(review.url);
+            biasGrouped[classification.bias].push({...claim, classification});
         }
+    });
 
-        function displayResults(claims, query, searchTime) {
-            const resultsEl = document.getElementById('results');
-            const searchStatsEl = document.getElementById('searchStats');
-            
-            // Display search stats
-            searchStatsEl.innerHTML = `
-                <div class="search-stats">
-                    <span class="query-text">Results for: "${query}"</span>
-                    <span class="result-count">${claims.length} results found</span>
-                    <span class="search-time">${searchTime}ms</span>
-                </div>
-            `;
-            
-            if (claims.length === 0) {
-                resultsEl.innerHTML = `
-                    <div class="no-results">
-                        <h3>No Fact-Checks Found</h3>
-                        <p>No fact-checking information found for "${query}". Try different keywords or check spelling.</p>
-                    </div>
-                `;
-                return;
-            }
+    let resultsHTML = '';
 
-            // Group results by credibility tier
-            const grouped = groupByTier(claims);
+    // Render each political bias category
+    ['center', 'lean-left', 'lean-right'].forEach(biasType => {
+        const articles = biasGrouped[biasType];
+        if (articles.length > 0) {
+            const colorScheme = COLOR_SCHEMES[biasType];
             
-            let resultsHTML = '';
-            
-            // High credibility sources first
-            if (grouped.high.length > 0) {
-                resultsHTML += `
-                    <div class="results-section">
-                        <h3 class="section-title">🎯 High Credibility Sources</h3>
-                        ${grouped.high.map(claim => createResultCard(claim, 'high')).join('')}
-                    </div>
-                `;
-            }
-            
-            // Medium credibility sources
-            if (grouped.medium.length > 0) {
-                resultsHTML += `
-                    <div class="results-section">
-                        <h3 class="section-title">📰 Medium Credibility Sources</h3>
-                        ${grouped.medium.map(claim => createResultCard(claim, 'medium')).join('')}
-                    </div>
-                `;
-            }
-            
-            // Low credibility sources last
-            if (grouped.low.length > 0) {
-                resultsHTML += `
-                    <div class="results-section">
-                        <h3 class="section-title">⚠️ Lower Credibility Sources</h3>
-                        ${grouped.low.map(claim => createResultCard(claim, 'low')).join('')}
-                    </div>
-                `;
-            }
-
-            resultsEl.innerHTML = resultsHTML;
-            
-            // Show methodology after displaying results
-            document.getElementById('methodology').style.display = 'block';
-        }
-
-        function groupByTier(claims) {
-            const grouped = { high: [], medium: [], low: [] };
-            
-            claims.forEach(claim => {
-                const review = claim.claimReview?.[0];
-                if (!review) return;
-                
-                const publisher = review.publisher?.name?.toLowerCase() || '';
-                const url = review.url || '';
-                
-                // High credibility fact-checkers
-                const highCredibilitySources = [
-                    'snopes', 'politifact', 'factcheck.org', 'factcheck', 
-                    'afp fact check', 'reuters', 'associated press', 'bbc reality check',
-                    'full fact', 'washington post fact checker', 'check your fact',
-                    'truthorfiction'
-                ];
-                
-                // Government and health organizations
-                const governmentSources = [
-                    'cdc', 'fda', 'who', 'nih', 'usda', 'epa', 'ftc', 'sec'
-                ];
-                
-                let tier = 'medium'; // default
-                
-                // Check for high credibility sources
-                if (highCredibilitySources.some(source => 
-                    publisher.includes(source) || url.includes(source))) {
-                    tier = 'high';
+            // Group articles by publisher within this bias category
+            const publisherGroups = {};
+            articles.forEach(article => {
+                const publisher = article.classification.display_name;
+                if (!publisherGroups[publisher]) {
+                    publisherGroups[publisher] = [];
                 }
-                // Check for government sources
-                else if (governmentSources.some(source => 
-                    publisher.includes(source) || url.includes(source))) {
-                    tier = 'high';
-                }
-                // Check for potentially low credibility indicators
-                else if (publisher.includes('blog') || publisher.includes('opinion') || 
-                         url.includes('blog') || url.includes('opinion')) {
-                    tier = 'low';
-                }
-                
-                grouped[tier].push(claim);
+                publisherGroups[publisher].push(article);
             });
             
-            return grouped;
-        }
-
-        function createResultCard(claim, tier) {
-            const review = claim.claimReview?.[0];
-            if (!review) return '';
-            
-            const title = claim.text || review.title || 'Fact Check';
-            const url = review.url || '#';
-            const publisher = review.publisher?.name || 'Unknown Publisher';
-            const rating = review.textualRating || 'No Rating';
-            const snippet = review.title || claim.text || 'No description available';
-            
-            const ratingClass = getRatingClass(rating);
-            
-            return `
-                <div class="result-card ${tier}">
-                    <div class="result-header">
-                        <div class="source-header">
-                            <div class="source-name">${publisher}</div>
-                            <div class="source-badges">
-                                <span class="rating ${ratingClass}">${rating}</span>
-                            </div>
-                        </div>
-                        <h4 class="result-title">
-                            <a href="${url}" target="_blank" rel="noopener">${title}</a>
-                        </h4>
-                    </div>
-                    <p class="result-snippet">${snippet}</p>
-                </div>
+            resultsHTML += `
+                <div class="results-section">
+                    <h3 class="section-title" style="
+                        background: ${colorScheme.background}; 
+                        color: ${colorScheme.text};
+                        padding: 12px 16px;
+                        border-radius: 8px;
+                        margin-bottom: 15px;
+                        border: 1px solid ${colorScheme.border};
+                    ">
+                        ${colorScheme.icon} ${colorScheme.label} Sources
+                        <span style="font-size: 14px; opacity: 0.9; margin-left: 10px;">
+                            (${articles.length} result${articles.length !== 1 ? 's' : ''})
+                        </span>
+                    </h3>
             `;
-        }
-
-        function getTierClass(tier) {
-            switch(tier?.toLowerCase()) {
-                case 'high':
-                case 'highest':
-                    return 'high';
-                case 'low':
-                case 'lowest':
-                    return 'low';
-                default:
-                    return 'medium';
-            }
-        }
-
-        function getRatingClass(rating) {
-            const ratingLower = rating?.toLowerCase() || '';
             
-            if (ratingLower.includes('true') || ratingLower.includes('correct') || 
-                ratingLower.includes('accurate') || ratingLower.includes('confirmed')) {
-                return 'true';
-            } else if (ratingLower.includes('false') || ratingLower.includes('misleading') || 
-                       ratingLower.includes('incorrect') || ratingLower.includes('wrong') ||
-                       ratingLower.includes('fake') || ratingLower.includes('hoax')) {
-                return 'false';
-            } else if (ratingLower.includes('mixed') || ratingLower.includes('partial') || 
-                       ratingLower.includes('mostly') || ratingLower.includes('some')) {
-                return 'mixed';
-            } else {
-                return 'unknown';
-            }
+            // Render each publisher group with expandable articles
+            Object.entries(publisherGroups).forEach(([publisher, publisherArticles]) => {
+                const primaryArticle = publisherArticles[0];
+                const additionalArticles = publisherArticles.slice(1);
+                const publisherId = publisher.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+                
+                resultsHTML += `
+                    <div class="publisher-group" style="margin-bottom: 20px;">
+                        ${createResultCard(primaryArticle, biasType)}
+                        
+                        ${additionalArticles.length > 0 ? `
+                            <div class="additional-articles-toggle" 
+                                 onclick="toggleAdditionalArticles('${publisherId}')"
+                                 style="
+                                     background: ${colorScheme.background};
+                                     color: ${colorScheme.text};
+                                     padding: 8px 16px;
+                                     border-radius: 0 0 8px 8px;
+                                     cursor: pointer;
+                                     text-align: center;
+                                     font-size: 14px;
+                                     margin-top: -8px;
+                                     transition: opacity 0.3s ease;
+                                     border: 1px solid ${colorScheme.border};
+                                     border-top: none;
+                                 "
+                                 onmouseover="this.style.opacity='0.8'"
+                                 onmouseout="this.style.opacity='1'">
+                                🔽 Show ${additionalArticles.length} more article${additionalArticles.length !== 1 ? 's' : ''}
+                            </div>
+                            <div id="additional-${publisherId}" class="additional-articles" style="display: none;">
+                                ${additionalArticles.map(article => createResultCard(article, biasType)).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            resultsHTML += `</div>`;
         }
+    });
 
-        // Focus search input on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('searchQuery').focus();
-        });
+    // Add methodology statement
+    resultsHTML += `
+        <div class="methodology-notice" style="
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #e9ecef;
+        ">
+            <h4 style="margin-bottom: 10px; color: #2c3e50;">🏛️ Source Classification Methodology</h4>
+            <p><strong>Political Bias:</strong> Classifications based on AllSides Media Bias Chart</p>
+            <p><strong>Color Coding:</strong> Traditional political colors (🔴 Red=Right, 🔵 Blue=Left, ⚫ Black=Center)</p>
+            <p><strong>Our Goal:</strong> Provide balanced perspectives across the political spectrum with full transparency</p>
+        </div>
+    `;
 
-        // Modal functions
-        function showPrivacyPolicy() {
-            document.getElementById('privacyModal').style.display = 'block';
+    resultsEl.innerHTML = resultsHTML;
+}
+
+function createResultCard(claim, biasType) {
+    const review = claim.claimReview?.[0];
+    if (!review) return '';
+    
+    const title = claim.text || review.title || 'Fact Check';
+    const url = review.url || '#';
+    const publisher = claim.classification?.display_name || review.publisher?.name || 'Unknown Publisher';
+    const rating = review.textualRating || 'No Rating';
+    const snippet = review.title || claim.text || 'No description available';
+    const colorScheme = COLOR_SCHEMES[biasType];
+    
+    const ratingClass = getRatingClass(rating);
+    
+    return `
+        <div class="result-card" style="
+            background: white;
+            border: 1px solid ${colorScheme.border};
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div class="result-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div class="source-name" style="
+                    font-weight: bold; 
+                    color: ${colorScheme.background}; 
+                    font-size: 16px;
+                ">${publisher.toUpperCase()}</div>
+                <span class="rating ${ratingClass}" style="
+                    background: ${getRatingColor(rating)};
+                    color: white;
+                    padding: 4px 12px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                ">${rating}</span>
+            </div>
+            <h4 class="result-title" style="
+                font-size: 18px;
+                line-height: 1.4;
+                margin-bottom: 10px;
+                color: #2c3e50;
+            ">
+                <a href="${url}" target="_blank" rel="noopener" style="
+                    color: inherit;
+                    text-decoration: none;
+                ">${title}</a>
+            </h4>
+            <p class="result-snippet" style="
+                color: #666;
+                line-height: 1.5;
+                margin-bottom: 10px;
+            ">${snippet}</p>
+            <a href="${url}" target="_blank" rel="noopener" style="
+                color: ${colorScheme.background};
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+            ">Read full fact-check →</a>
+        </div>
+    `;
+}
+
+function toggleAdditionalArticles(publisherId) {
+    const element = document.getElementById(`additional-${publisherId}`);
+    const toggle = element.previousElementSibling;
+    
+    if (element.style.display === 'none') {
+        element.style.display = 'block';
+        toggle.innerHTML = toggle.innerHTML.replace('🔽 Show', '🔼 Hide');
+    } else {
+        element.style.display = 'none';
+        toggle.innerHTML = toggle.innerHTML.replace('🔼 Hide', '🔽 Show');
+    }
+    
+    // Track analytics
+    if (typeof plausible !== 'undefined') {
+        plausible('Source Expanded', {props: {publisher: publisherId}});
+    }
+}
+
+function getRatingClass(rating) {
+    const ratingLower = rating?.toLowerCase() || '';
+    if (ratingLower.includes('false') || ratingLower.includes('incorrect')) return 'false';
+    if (ratingLower.includes('true') || ratingLower.includes('correct')) return 'true';
+    if (ratingLower.includes('misleading') || ratingLower.includes('mixed')) return 'mixed';
+    return 'unrated';
+}
+
+function getRatingColor(rating) {
+    const ratingLower = rating?.toLowerCase() || '';
+    if (ratingLower.includes('false') || ratingLower.includes('incorrect')) return '#dc2626';
+    if (ratingLower.includes('true') || ratingLower.includes('correct')) return '#16a34a';
+    if (ratingLower.includes('misleading') || ratingLower.includes('mixed')) return '#ea580c';
+    return '#6b7280';
+}
+
+// Enter key support for search
+document.getElementById('searchQuery').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchFactChecks();
+    }
+});
+
+// Analytics tracking
+if (typeof plausible !== 'undefined') {
+    // Track searches
+    const originalSearch = searchFactChecks;
+    searchFactChecks = function() {
+        const query = document.getElementById('searchQuery').value.trim();
+        if (query) {
+            plausible('Fact Check Search', {props: {query_length: query.length}});
         }
+        return originalSearch.apply(this, arguments);
+    };
+}
 
-        function showTerms() {
-            alert('Terms of Service: This is a fact-checking tool for informational purposes. Results are aggregated from multiple sources. Users should verify information independently.');
-        }
-
-        function showContact() {
-            alert('Contact: For questions or feedback, please email contact@theopenrecord.org');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('privacyModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Focus search input
+    document.getElementById('searchQuery').focus();
+    
+    // Track page load
+    if (typeof plausible !== 'undefined') {
+        plausible('Fact Checker Loaded');
+    }
+});
     </script>
 
     <!-- Google Analytics -->
